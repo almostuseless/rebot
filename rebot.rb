@@ -16,7 +16,7 @@ bot = Cinch::Bot.new do
     on :message, /^\.regex (.*?)\s(s)?\/(.*?)\/([a-z]*)$/ do |m,string,sub,regex,mods|
 
         #Declare result string
-        line = "[res: 0] "
+        line = "[res: \x020\x02] "
 
         ## we'll rescue errors if shit goes nuts
         begin
