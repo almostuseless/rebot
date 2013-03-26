@@ -8,8 +8,8 @@ bot = Cinch::Bot.new do
     configure do |c|
         c.nick = "rebot"
         c.username = "rebot"
-        c.server = "irc.tddirc.net"
-        c.channels = ["#failbot"]
+        c.server = "irc.freenode.net"
+        c.channels = ["###failbot"]
     end
 
 #    on :message, /^\.regex (.*?)\s*(s)?\/(.+)\/(\w*)$/ do |m,string,sub,regex,mods|
