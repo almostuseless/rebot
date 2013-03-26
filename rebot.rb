@@ -30,21 +30,10 @@ bot = Cinch::Bot.new do
                 regex   = Regexp.try_convert( /#{regex}/ )
 
                 ## is string a url?
-
-                puts "\n\n###########################"
-                puts "string: #{string}"
-                puts "############################\n\n"
-                
                 if string =~ /^https?:\/\/\S+$/
                     a = Mechanize.new()
                     string = a.get(string).content
                 end
-
-                
-                puts "\n\n###########################"
-                puts "string: #{string}"
-                puts "############################\n\n"
-
 
                 ## if global, do scan() instead of match()
                 if mods.match(/g/)
