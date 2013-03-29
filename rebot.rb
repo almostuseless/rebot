@@ -12,11 +12,10 @@ bot = Cinch::Bot.new do
         c.channels = ["###failbot"]
     end
 
-#    on :message, /^\.regex (.*?)\s*(s)?\/(.+)\/(\w*)$/ do |m,string,sub,regex,mods|
     on :message, /^\.regex (.*?)\s(s)?\/(.*?)\/([a-z]*)$/ do |m,string,sub,regex,mods|
 
         #Declare result string
-        line = "[res: \x020\x02] "
+        line = "[res: \x020\x02, "
 
         ## we'll rescue errors if shit goes nuts
         begin
@@ -25,9 +24,6 @@ bot = Cinch::Bot.new do
 
             ## s///?
             if sub.nil?
-
-                ## Throw an error if the expression doesnt compile
-                regex   = Regexp.try_convert( /#{regex}/ )
 
                 ## is string a url?
                 if string =~ /^https?:\/\/\S+$/
@@ -38,7 +34,16 @@ bot = Cinch::Bot.new do
                 ## if global, do scan() instead of match()
                 if mods.match(/g/)
 
-                    string.scan( /#{Regexp.new(regex)}/ ).each do |a|
+                    r = Regexp.new( regex, mods.match(/i/) ? true : false )
+
+                    start = Time.now
+                    res = string.scan( r )
+                    time = (Time.now - start) * 1000
+                    time = time.to_s[0..5] + "ms"
+                    time.gsub!(/(\.0+)(\d+)/,"\\1\x02\\2\x02")
+                    line += "#{time}] "
+
+                    res.each do |a|
 
                         offset  = string.index( a[0] )
                         line    += "[\x02#{i}\x02:#{offset + 1}-#{offset + a[0].length}: \"#{a[0]}\"] "
@@ -46,14 +51,24 @@ bot = Cinch::Bot.new do
                     end
                 else
 
+                    
                     ## Match and format MatchData to Array, iterate through each backreference
-                    string.match( /#{Regexp.new(regex)}/ ).to_a.each do |a|
+                    r = Regexp.new( regex, mods.match(/i/) ? true : false )
+
+                    # Time it
+                    start = Time.now
+                    res = string.match( r )
+                    time = (Time.now - start) * 1000
+                    time = time.to_s[0..5] + "ms"
+                    time.gsub!(/(\.0+)(\d+)/,"\\1\x02\\2\x02")
+                    line += "#{time}] "
+
+                    res.to_a.each do |a|
 
                         ## find offset of backreference and append it to the result string
                         offset  = string.index( a )
 
-                        line    += "[#{i}:\x02#{offset + 1}\x02-\x02#{offset + a.length }\x02: \"#{a}\"] "
-
+                        line    += "[\x02#{i}\x02:#{offset + 1}-#{offset + a.length }: \"#{a}\"] "
                         i       += 1
                     end
                 end
@@ -62,7 +77,14 @@ bot = Cinch::Bot.new do
                 regex.match(/(?<search>.*?)(?<!\\)\/(?<replace>.+)/) do |m|
                 needle = Regexp.try_convert( /#{m[:search]}/ )
 
-                line += string.gsub!( Regexp.new(needle), m[:replace] )
+                start = Time.now
+                res  = string.gsub!( Regexp.new(needle), m[:replace] )
+                time = (Time.now - start) * 1000
+                time = time.to_s[0..5] + "ms"
+                time.gsub!(/(\.0+)(\d+)/,"\\1\x02\\2\x02")
+                line += "#{time}] "
+
+                line += res
                 end
             end
 
